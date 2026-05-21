@@ -45,16 +45,16 @@ public class SessionController {
 
     // Reveal current word and advance turn
     @PostMapping("/{sessionId}/reveal")
-    public ResponseEntity<SessionWord> revealWord(
+    public ResponseEntity<Session> revealWord(
             @PathVariable UUID sessionId,
             @RequestBody RevealWordRequest request
     ) {
-        SessionWord sessionWord = sessionService.revealWord(
+        Session session = sessionService.revealWord(
                 sessionId,
                 request.revealedBy(),
                 request.hintUsed()
         );
-        return ResponseEntity.ok(sessionWord);
+        return ResponseEntity.ok(session);
     }
 
     // Get all sessions for a teacher

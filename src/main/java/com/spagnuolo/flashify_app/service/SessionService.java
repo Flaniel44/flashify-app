@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.transaction.annotation.Transactional;
 /*
 Three main responsibilities:
 createSession — a teacher kicks off a session for a specific student using a specific word bank. 
@@ -68,7 +70,8 @@ public class SessionService {
     }
 
     // Reveal the current word and advance to the next turn
-    public SessionWord revealWord(UUID sessionId, String revealedBy, boolean hintUsed) {
+    @Transactional
+    public Session revealWord(UUID sessionId, String revealedBy, boolean hintUsed) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
@@ -98,8 +101,7 @@ public class SessionService {
             session.setCompletedAt(LocalDateTime.now());
         }
 
-        sessionRepository.save(session);
-        return sessionWord;
+        return sessionRepository.save(session);
     }
 
     public Optional<Session> findByInviteToken(UUID inviteToken) {
