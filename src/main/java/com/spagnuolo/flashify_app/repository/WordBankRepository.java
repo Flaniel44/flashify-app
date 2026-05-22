@@ -14,4 +14,7 @@ public interface WordBankRepository extends JpaRepository<WordBank, UUID> {
 
     @Query("SELECT wb FROM WordBank wb JOIN wb.students s WHERE s.id = :studentId")
     List<WordBank> findByStudentId(@Param("studentId") UUID studentId);
+
+    @Query("SELECT DISTINCT wb FROM WordBank wb JOIN wb.students s WHERE s.teacher.id = :teacherId")
+List<WordBank> findByTeacherId(@Param("teacherId") UUID teacherId);
 }

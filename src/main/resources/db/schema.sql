@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS student_word_banks (
 -- Words
 CREATE TABLE IF NOT EXISTS words (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    word_bank_id UUID NOT NULL REFERENCES word_banks(id),
+    word_bank_id UUID NOT NULL REFERENCES word_banks(id) ON DELETE CASCADE,
     word VARCHAR(100) NOT NULL,
     translation VARCHAR(100),
     hint TEXT,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     teacher_id UUID NOT NULL REFERENCES teachers(id),
     student_id UUID NOT NULL REFERENCES students(id),
-    word_bank_id UUID NOT NULL REFERENCES word_banks(id),
+    word_bank_id UUID NOT NULL REFERENCES word_banks(id) ON DELETE CASCADE,
     status VARCHAR(20) DEFAULT 'waiting' CHECK (status IN ('waiting', 'active', 'completed')),
     current_word_index INT DEFAULT 0,
     current_turn VARCHAR(10) CHECK (current_turn IN ('teacher', 'student')),
@@ -59,8 +59,8 @@ CREATE TABLE IF NOT EXISTS sessions (
 -- Session words
 CREATE TABLE IF NOT EXISTS session_words (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    session_id UUID NOT NULL REFERENCES sessions(id),
-    word_id UUID NOT NULL REFERENCES words(id),
+    session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+    word_id UUID NOT NULL REFERENCES words(id) ON DELETE CASCADE,
     revealed_by VARCHAR(10) CHECK (revealed_by IN ('teacher', 'student')),
     hint_used BOOLEAN DEFAULT FALSE,
     revealed_at TIMESTAMP DEFAULT NOW()

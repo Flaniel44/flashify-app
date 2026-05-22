@@ -110,4 +110,9 @@ public class WordBankService {
     public void deleteWordBank(UUID id) {
         wordBankRepository.deleteById(id);
     }
+
+    @Transactional
+    public List<WordBank> findByTeacherId(UUID teacherId) {
+        return wordBankRepository.findByTeacherId(teacherId);
+    }
 }

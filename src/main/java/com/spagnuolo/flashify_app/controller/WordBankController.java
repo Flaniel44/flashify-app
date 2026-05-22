@@ -94,4 +94,9 @@ public class WordBankController {
 
     public record CreateWordBankRequest(UUID studentId, String name) {}
     public record UpdateWordBankRequest(String name) {}
+    
+    @GetMapping("/teacher/{teacherId}")
+    public ResponseEntity<List<WordBank>> getWordBanksByTeacher(@PathVariable UUID teacherId) {
+        return ResponseEntity.ok(wordBankService.findByTeacherId(teacherId));
+    }
 }
