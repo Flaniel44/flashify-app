@@ -45,6 +45,10 @@ public class Session {
 
     private LocalDateTime completedAt;
 
+    private Boolean wordRevealed = false;
+
+    private Boolean hintRevealed = false;
+
     @PrePersist
     public void prePersist() {
         if (inviteToken == null) {
