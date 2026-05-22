@@ -69,37 +69,55 @@ public class SessionService {
         return session;
     }
 
-    // Reveal the current word and advance to the next turn
-    @Transactional
-    public Session revealWord(UUID sessionId, String revealedBy, boolean hintUsed) {
-        Session session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new RuntimeException("Session not found"));
+    // Reveal the word to both players
+@Transactional
+public Session revealWord(UUID sessionId, String revealedBy) {
+    Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        List<Word> words = wordRepository.findByWordBankId(session.getWordBank().getId());
+    session.setWordRevealed(true);
 
-        if (session.getCurrentWordIndex() >= words.size()) {
-            throw new RuntimeException("No more words in this session");
-        }
+    // Record the revealed word
+    List<Word> words = wordRepository.findByWordBankId(session.getWordBank().getId());
+    Word currentWord = words.get(session.getCurrentWordIndex());
 
-        Word currentWord = words.get(session.getCurrentWordIndex());
+    SessionWord sessionWord = new SessionWord();
+    sessionWord.setSession(session);
+    sessionWord.setWord(currentWord);
+    sessionWord.setRevealedBy(revealedBy);
+    sessionWord.setHintUsed(session.getHintRevealed());
+    sessionWordRepository.save(sessionWord);
 
-        // Record the revealed word
-        SessionWord sessionWord = new SessionWord();
-        sessionWord.setSession(session);
-        sessionWord.setWord(currentWord);
-        sessionWord.setRevealedBy(revealedBy);
-        sessionWord.setHintUsed(hintUsed);
-        sessionWordRepository.save(sessionWord);
+    return sessionRepository.save(session);
+}
 
-        // Advance index and alternate turn
-        session.setCurrentWordIndex(session.getCurrentWordIndex() + 1);
-        session.setCurrentTurn(revealedBy.equals("teacher") ? "student" : "teacher");
+// Reveal the hint to both players
+@Transactional
+public Session revealHint(UUID sessionId) {
+    Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        // Check if session is completed
-        if (session.getCurrentWordIndex() >= words.size()) {
-            session.setStatus("completed");
-            session.setCompletedAt(LocalDateTime.now());
-        }
+    session.setHintRevealed(true);
+    return sessionRepository.save(session);
+}
+
+// Advance to the next word and switch turn
+@Transactional
+public Session nextWord(UUID sessionId, String currentTurn) {
+    Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(() -> new RuntimeException("Session not found"));
+
+    List<Word> words = wordRepository.findByWordBankId(session.getWordBank().getId());
+
+    session.setCurrentWordIndex(session.getCurrentWordIndex() + 1);
+    session.setCurrentTurn(currentTurn.equals("teacher") ? "student" : "teacher");
+    session.setWordRevealed(false);
+    session.setHintRevealed(false);
+
+    if (session.getCurrentWordIndex() >= words.size()) {
+        session.setStatus("completed");
+        session.setCompletedAt(LocalDateTime.now());
+    }
 
         return sessionRepository.save(session);
     }

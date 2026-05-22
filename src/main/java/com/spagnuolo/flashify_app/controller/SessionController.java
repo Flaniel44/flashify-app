@@ -43,7 +43,7 @@ public class SessionController {
         return ResponseEntity.ok(session);
     }
 
-    // Reveal current word and advance turn
+    // Reveal current word
     @PostMapping("/{sessionId}/reveal")
     public ResponseEntity<Session> revealWord(
             @PathVariable UUID sessionId,
@@ -51,8 +51,7 @@ public class SessionController {
     ) {
         Session session = sessionService.revealWord(
                 sessionId,
-                request.revealedBy(),
-                request.hintUsed()
+                request.revealedBy()
         );
         return ResponseEntity.ok(session);
     }

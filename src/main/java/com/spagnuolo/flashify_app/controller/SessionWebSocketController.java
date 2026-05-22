@@ -16,9 +16,7 @@ public class SessionWebSocketController {
 
     private final SessionService sessionService;
 
-    // Teacher or student sends a reveal action
-    // Frontend sends to: /app/session/{sessionId}/reveal
-    // Everyone subscribed to: /topic/session/{sessionId} receives the update
+    // Active player reveals the word to both players
     @MessageMapping("/session/{sessionId}/reveal")
     @SendTo("/topic/session/{sessionId}")
     public Session revealWord(
@@ -27,8 +25,27 @@ public class SessionWebSocketController {
     ) {
         return sessionService.revealWord(
                 UUID.fromString(sessionId),
-                message.revealedBy(),
-                message.hintUsed()
+                message.revealedBy()
+        );
+    }
+
+    // Active player reveals the hint to both players
+    @MessageMapping("/session/{sessionId}/hint")
+    @SendTo("/topic/session/{sessionId}")
+    public Session revealHint(@DestinationVariable String sessionId) {
+        return sessionService.revealHint(UUID.fromString(sessionId));
+    }
+
+    // Active player moves to the next word
+    @MessageMapping("/session/{sessionId}/next")
+    @SendTo("/topic/session/{sessionId}")
+    public Session nextWord(
+            @DestinationVariable String sessionId,
+            NextWordMessage message
+    ) {
+        return sessionService.nextWord(
+                UUID.fromString(sessionId),
+                message.currentTurn()
         );
     }
 
@@ -42,5 +59,6 @@ public class SessionWebSocketController {
                 .orElseThrow(() -> new RuntimeException("Session not found"));
     }
 
-    public record RevealMessage(String revealedBy, boolean hintUsed) {}
+    public record RevealMessage(String revealedBy) {}
+    public record NextWordMessage(String currentTurn) {}
 }
