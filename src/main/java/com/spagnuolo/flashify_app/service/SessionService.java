@@ -142,4 +142,16 @@ public Session nextWord(UUID sessionId, String currentTurn) {
         session.setCompletedAt(LocalDateTime.now());
         return sessionRepository.save(session);
     }
+
+    @Transactional
+    public void cleanUpStaleSessions() {
+        LocalDateTime cutoff = LocalDateTime.now().minusHours(2);
+        List<Session> staleSessions = sessionRepository.findStaleActiveSessions(cutoff);
+        staleSessions.forEach(s -> {
+            s.setStatus("completed");
+            s.setCompletedAt(LocalDateTime.now());
+        });
+        sessionRepository.saveAll(staleSessions);
+        System.out.println(">>> Cleaned up " + staleSessions.size() + " stale sessions");
+    }
 }
