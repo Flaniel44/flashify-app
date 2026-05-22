@@ -18,9 +18,15 @@ CREATE TABLE IF NOT EXISTS students (
 -- Word banks
 CREATE TABLE IF NOT EXISTS word_banks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    student_id UUID NOT NULL REFERENCES students(id),
     name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Student word banks (many-to-many)
+CREATE TABLE IF NOT EXISTS student_word_banks (
+    student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    word_bank_id UUID NOT NULL REFERENCES word_banks(id) ON DELETE CASCADE,
+    PRIMARY KEY (student_id, word_bank_id)
 );
 
 -- Words

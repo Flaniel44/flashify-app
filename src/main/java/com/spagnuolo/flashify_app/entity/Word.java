@@ -1,11 +1,13 @@
 package com.spagnuolo.flashify_app.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "words")
 public class Word {
@@ -22,8 +24,6 @@ public class Word {
     private String word;
 
     private String translation;
-
     private String hint;
-
     private String notes;
 }

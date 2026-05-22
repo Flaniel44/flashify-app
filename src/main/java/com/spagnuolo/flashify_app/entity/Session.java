@@ -1,13 +1,15 @@
 package com.spagnuolo.flashify_app.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "sessions")
 public class Session {
@@ -32,22 +34,19 @@ public class Session {
     private String status = "waiting";
 
     private Integer currentWordIndex = 0;
-
     private String currentTurn;
 
     @Column(nullable = false, unique = true)
     private UUID inviteToken;
 
+    private Boolean wordRevealed = false;
+    private Boolean hintRevealed = false;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     private LocalDateTime startedAt;
-
     private LocalDateTime completedAt;
-
-    private Boolean wordRevealed = false;
-
-    private Boolean hintRevealed = false;
 
     @PrePersist
     public void prePersist() {

@@ -1,13 +1,15 @@
 package com.spagnuolo.flashify_app.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "session_words")
 public class SessionWord {
@@ -25,7 +27,6 @@ public class SessionWord {
     private Word word;
 
     private String revealedBy;
-
     private Boolean hintUsed = false;
 
     @CreationTimestamp
