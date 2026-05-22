@@ -133,4 +133,13 @@ public Session nextWord(UUID sessionId, String currentTurn) {
     public List<Session> findByTeacherId(UUID teacherId) {
         return sessionRepository.findByTeacherId(teacherId);
     }
+
+    @Transactional
+    public Session endSession(UUID sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Session not found"));
+        session.setStatus("completed");
+        session.setCompletedAt(LocalDateTime.now());
+        return sessionRepository.save(session);
+    }
 }

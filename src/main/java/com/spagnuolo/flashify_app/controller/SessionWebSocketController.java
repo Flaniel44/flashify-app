@@ -61,4 +61,10 @@ public class SessionWebSocketController {
 
     public record RevealMessage(String revealedBy) {}
     public record NextWordMessage(String currentTurn) {}
+
+    @MessageMapping("/session/{sessionId}/end")
+    @SendTo("/topic/session/{sessionId}")
+    public Session endSession(@DestinationVariable String sessionId) {
+        return sessionService.endSession(UUID.fromString(sessionId));
+    }
 }
