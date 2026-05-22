@@ -15,6 +15,7 @@ GET /api/teachers/{id} — looks up a teacher by their ID
 
 This will mostly be used during initial setup, since there's really only one teacher.
 */
+
 @RestController
 @RequestMapping("/api/teachers")
 @RequiredArgsConstructor
@@ -22,10 +23,29 @@ public class TeacherController {
 
     private final TeacherService teacherService;
 
-    @PostMapping
-    public ResponseEntity<Teacher> createTeacher(@RequestBody CreateTeacherRequest request) {
-        Teacher teacher = teacherService.createTeacher(request.name(), request.email());
-        return ResponseEntity.ok(teacher);
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            Teacher teacher = teacherService.register(
+                    request.name(),
+                    request.username(),
+                    request.password(),
+                    request.registrationCode()
+            );
+            return ResponseEntity.ok(teacher);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            Teacher teacher = teacherService.login(request.username(), request.password());
+            return ResponseEntity.ok(teacher);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
@@ -35,5 +55,6 @@ public class TeacherController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public record CreateTeacherRequest(String name, String email) {}
+    public record RegisterRequest(String name, String username, String password, String registrationCode) {}
+    public record LoginRequest(String username, String password) {}
 }

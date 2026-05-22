@@ -20,13 +20,12 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final TeacherService teacherService;
 
-    public Student createStudent(UUID teacherId, String name, String email) {
+    public Student createStudent(UUID teacherId, String name) {
         Teacher teacher = teacherService.findById(teacherId)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
         Student student = new Student();
         student.setTeacher(teacher);
         student.setName(name);
-        student.setEmail(email);
         return studentRepository.save(student);
     }
 

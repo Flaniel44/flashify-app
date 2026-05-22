@@ -28,8 +28,7 @@ public class StudentController {
     public ResponseEntity<Student> createStudent(@RequestBody CreateStudentRequest request) {
         Student student = studentService.createStudent(
                 request.teacherId(),
-                request.name(),
-                request.email()
+                request.name()
         );
         return ResponseEntity.ok(student);
     }
@@ -46,5 +45,5 @@ public class StudentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public record CreateStudentRequest(UUID teacherId, String name, String email) {}
+    public record CreateStudentRequest(UUID teacherId, String name) {}
 }

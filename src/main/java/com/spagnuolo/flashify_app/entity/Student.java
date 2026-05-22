@@ -23,8 +23,6 @@ public class Student {
     @Column(nullable = false)
     private String name;
 
-    private String email;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

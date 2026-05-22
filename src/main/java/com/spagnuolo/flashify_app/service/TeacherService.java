@@ -3,31 +3,52 @@ package com.spagnuolo.flashify_app.service;
 import com.spagnuolo.flashify_app.entity.Teacher;
 import com.spagnuolo.flashify_app.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
-
-//handles creating a teacher account and looking one up either by their ID or email
 @Service
 @RequiredArgsConstructor
 public class TeacherService {
 
     private final TeacherRepository teacherRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public Teacher createTeacher(String name, String email) {
+    // Registration code — keep this secret!
+    private static final String REGISTRATION_CODE = "flashify2026";
+
+    public Teacher register(String name, String username, String password, String registrationCode) {
+        if (!registrationCode.equals(REGISTRATION_CODE)) {
+            throw new RuntimeException("Invalid registration code");
+        }
+        if (teacherRepository.findByUsername(username).isPresent()) {
+            throw new RuntimeException("Username already taken");
+        }
         Teacher teacher = new Teacher();
         teacher.setName(name);
-        teacher.setEmail(email);
+        teacher.setUsername(username);
+        teacher.setPassword(passwordEncoder.encode(password));
         return teacherRepository.save(teacher);
+    }
+
+    public Teacher login(String username, String password) {
+        Teacher teacher = teacherRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+        if (!passwordEncoder.matches(password, teacher.getPassword())) {
+            throw new RuntimeException("Invalid username or password");
+        }
+        // Never return the password to the frontend
+        teacher.setPassword(null);
+        return teacher;
     }
 
     public Optional<Teacher> findById(UUID id) {
         return teacherRepository.findById(id);
     }
 
-    public Optional<Teacher> findByEmail(String email) {
-        return teacherRepository.findByEmail(email);
+    public Optional<Teacher> findByUsername(String username) {
+        return teacherRepository.findByUsername(username);
     }
 }

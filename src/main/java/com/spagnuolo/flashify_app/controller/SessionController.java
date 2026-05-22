@@ -1,7 +1,6 @@
 package com.spagnuolo.flashify_app.controller;
 
 import com.spagnuolo.flashify_app.entity.Session;
-import com.spagnuolo.flashify_app.entity.SessionWord;
 import com.spagnuolo.flashify_app.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
