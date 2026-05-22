@@ -55,4 +55,26 @@ public class WordController {
             String hint,
             String notes
     ) {}
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Word> updateWord(
+            @PathVariable UUID id,
+            @RequestBody UpdateWordRequest request
+    ) {
+        return ResponseEntity.ok(wordService.updateWord(
+                id,
+                request.word(),
+                request.translation(),
+                request.hint(),
+                request.notes()
+        ));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteWord(@PathVariable UUID id) {
+        wordService.deleteWord(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    public record UpdateWordRequest(String word, String translation, String hint, String notes) {}
 }

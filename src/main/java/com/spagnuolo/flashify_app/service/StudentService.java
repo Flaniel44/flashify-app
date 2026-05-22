@@ -36,4 +36,15 @@ public class StudentService {
     public Optional<Student> findById(UUID id) {
         return studentRepository.findById(id);
     }
+
+    public Student updateStudent(UUID id, String name) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        student.setName(name);
+        return studentRepository.save(student);
+    }
+
+    public void deleteStudent(UUID id) {
+        studentRepository.deleteById(id);
+    }
 }

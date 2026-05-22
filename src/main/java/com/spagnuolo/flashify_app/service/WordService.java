@@ -38,4 +38,18 @@ public class WordService {
     public Optional<Word> findById(UUID id) {
         return wordRepository.findById(id);
     }
+
+    public Word updateWord(UUID id, String word, String translation, String hint, String notes) {
+        Word existing = wordRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Word not found"));
+        existing.setWord(word);
+        existing.setTranslation(translation);
+        existing.setHint(hint);
+        existing.setNotes(notes);
+        return wordRepository.save(existing);
+    }
+
+    public void deleteWord(UUID id) {
+        wordRepository.deleteById(id);
+    }
 }

@@ -46,4 +46,20 @@ public class StudentController {
     }
 
     public record CreateStudentRequest(UUID teacherId, String name) {}
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Student> updateStudent(
+            @PathVariable UUID id,
+            @RequestBody UpdateStudentRequest request
+    ) {
+        return ResponseEntity.ok(studentService.updateStudent(id, request.name()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStudent(@PathVariable UUID id) {
+        studentService.deleteStudent(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    public record UpdateStudentRequest(String name) {}
 }

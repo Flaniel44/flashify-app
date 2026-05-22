@@ -33,4 +33,15 @@ public class WordBankService {
     public Optional<WordBank> findById(UUID id) {
         return wordBankRepository.findById(id);
     }
+    
+    public WordBank updateWordBank(UUID id, String name) {
+        WordBank wordBank = wordBankRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Word bank not found"));
+        wordBank.setName(name);
+        return wordBankRepository.save(wordBank);
+}
+
+    public void deleteWordBank(UUID id) {
+        wordBankRepository.deleteById(id);
+    }
 }

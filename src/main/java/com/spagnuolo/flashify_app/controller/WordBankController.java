@@ -45,4 +45,20 @@ public class WordBankController {
     }
 
     public record CreateWordBankRequest(UUID studentId, String name) {}
+
+    @PutMapping("/{id}")
+    public ResponseEntity<WordBank> updateWordBank(
+            @PathVariable UUID id,
+            @RequestBody UpdateWordBankRequest request
+    ) {
+        return ResponseEntity.ok(wordBankService.updateWordBank(id, request.name()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteWordBank(@PathVariable UUID id) {
+        wordBankService.deleteWordBank(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    public record UpdateWordBankRequest(String name) {}
 }
