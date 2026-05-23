@@ -46,11 +46,13 @@ CREATE TABLE IF NOT EXISTS sessions (
     student_id UUID NOT NULL REFERENCES students(id),
     word_bank_id UUID NOT NULL REFERENCES word_banks(id) ON DELETE CASCADE,
     status VARCHAR(20) DEFAULT 'waiting' CHECK (status IN ('waiting', 'active', 'completed')),
+    session_type VARCHAR(20) DEFAULT 'alternating' CHECK (session_type IN ('alternating', 'teacher_only', 'student_only')),
     current_word_index INT DEFAULT 0,
     current_turn VARCHAR(10) CHECK (current_turn IN ('teacher', 'student')),
     invite_token UUID DEFAULT gen_random_uuid(),
     word_revealed BOOLEAN DEFAULT FALSE,
     hint_revealed BOOLEAN DEFAULT FALSE,
+    shuffled BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT NOW(),
     started_at TIMESTAMP,
     completed_at TIMESTAMP
@@ -64,4 +66,12 @@ CREATE TABLE IF NOT EXISTS session_words (
     revealed_by VARCHAR(10) CHECK (revealed_by IN ('teacher', 'student')),
     hint_used BOOLEAN DEFAULT FALSE,
     revealed_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Session word order (for shuffled sessions)
+CREATE TABLE IF NOT EXISTS session_word_order (
+    session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+    word_id UUID NOT NULL REFERENCES words(id) ON DELETE CASCADE,
+    position INT NOT NULL,
+    PRIMARY KEY (session_id, position)
 );

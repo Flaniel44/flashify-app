@@ -1,6 +1,7 @@
 package com.spagnuolo.flashify_app.controller;
 
 import com.spagnuolo.flashify_app.entity.Session;
+import com.spagnuolo.flashify_app.entity.Word;
 import com.spagnuolo.flashify_app.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +31,14 @@ public class SessionController {
         Session session = sessionService.createSession(
                 request.teacherId(),
                 request.studentId(),
-                request.wordBankId()
+                request.wordBankId(),
+                request.sessionType(),
+                request.shuffled()
         );
         return ResponseEntity.ok(session);
     }
+
+    
 
     // Student joins via invite token in URL
     @PostMapping("/join/{inviteToken}")
@@ -69,6 +74,11 @@ public class SessionController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public record CreateSessionRequest(UUID teacherId, UUID studentId, UUID wordBankId) {}
+    @GetMapping("/{id}/words")
+    public ResponseEntity<List<Word>> getSessionWords(@PathVariable UUID id) {
+        return ResponseEntity.ok(sessionService.getSessionWords(id));
+    }
+
+    public record CreateSessionRequest(UUID teacherId, UUID studentId, UUID wordBankId, String sessionType, boolean shuffled) {}
     public record RevealWordRequest(String revealedBy, boolean hintUsed) {}
 }

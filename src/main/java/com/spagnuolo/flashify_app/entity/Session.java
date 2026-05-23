@@ -54,4 +54,7 @@ public class Session {
             inviteToken = UUID.randomUUID();
         }
     }
+
+    private String sessionType = "alternating";
+    private Boolean shuffled = false;
 }
