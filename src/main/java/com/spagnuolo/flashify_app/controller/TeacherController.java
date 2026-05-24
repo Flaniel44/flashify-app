@@ -24,19 +24,22 @@ public class TeacherController {
     private final TeacherService teacherService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        try {
-            Teacher teacher = teacherService.register(
-                    request.name(),
-                    request.username(),
-                    request.password(),
-                    request.registrationCode()
-            );
-            return ResponseEntity.ok(teacher);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    try {
+        Teacher teacher = teacherService.register(
+                request.name(),
+                request.username(),
+                request.password(),
+                request.registrationCode(),
+                request.email()
+        );
+        return ResponseEntity.ok(teacher);
+    } catch (RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
+}
+
+public record RegisterRequest(String name, String username, String password, String registrationCode, String email) {}
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -55,6 +58,6 @@ public class TeacherController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public record RegisterRequest(String name, String username, String password, String registrationCode) {}
+    
     public record LoginRequest(String username, String password) {}
 }

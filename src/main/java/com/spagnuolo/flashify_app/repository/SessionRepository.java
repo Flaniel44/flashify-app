@@ -18,4 +18,6 @@ public interface SessionRepository extends JpaRepository<Session, UUID> {
     List<Session> findByStudentId(UUID studentId);
     @Query("SELECT s FROM Session s WHERE s.status = 'active' AND s.startedAt < :cutoff")
     List<Session> findStaleActiveSessions(@Param("cutoff") LocalDateTime cutoff);
+    @Query("SELECT s FROM Session s WHERE s.student.id = :studentId ORDER BY s.createdAt DESC LIMIT 1")
+Optional<Session> findLastSessionByStudentId(@Param("studentId") UUID studentId);
 }

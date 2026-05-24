@@ -34,4 +34,6 @@ public class Student {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private String email;
 }

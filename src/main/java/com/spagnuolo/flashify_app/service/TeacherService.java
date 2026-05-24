@@ -19,19 +19,20 @@ public class TeacherService {
     // Registration code — keep this secret!
     private static final String REGISTRATION_CODE = "flashify2026";
 
-    public Teacher register(String name, String username, String password, String registrationCode) {
-        if (!registrationCode.equals(REGISTRATION_CODE)) {
-            throw new RuntimeException("Invalid registration code");
-        }
-        if (teacherRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("Username already taken");
-        }
-        Teacher teacher = new Teacher();
-        teacher.setName(name);
-        teacher.setUsername(username);
-        teacher.setPassword(passwordEncoder.encode(password));
-        return teacherRepository.save(teacher);
+    public Teacher register(String name, String username, String password, String registrationCode, String email) {
+    if (!registrationCode.equals(REGISTRATION_CODE)) {
+        throw new RuntimeException("Invalid registration code");
     }
+    if (teacherRepository.findByUsername(username).isPresent()) {
+        throw new RuntimeException("Username already taken");
+    }
+    Teacher teacher = new Teacher();
+    teacher.setName(name);
+    teacher.setUsername(username);
+    teacher.setPassword(passwordEncoder.encode(password));
+    teacher.setEmail(email);
+    return teacherRepository.save(teacher);
+}
 
     public Teacher login(String username, String password) {
         Teacher teacher = teacherRepository.findByUsername(username)

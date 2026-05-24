@@ -2,10 +2,13 @@ package com.spagnuolo.flashify_app.service;
 
 import com.spagnuolo.flashify_app.entity.Student;
 import com.spagnuolo.flashify_app.entity.Teacher;
+import com.spagnuolo.flashify_app.repository.SessionRepository;
 import com.spagnuolo.flashify_app.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.spagnuolo.flashify_app.entity.Session;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,15 +22,17 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final TeacherService teacherService;
+    private final SessionRepository sessionRepository;
 
-    public Student createStudent(UUID teacherId, String name) {
-        Teacher teacher = teacherService.findById(teacherId)
-                .orElseThrow(() -> new RuntimeException("Teacher not found"));
-        Student student = new Student();
-        student.setTeacher(teacher);
-        student.setName(name);
-        return studentRepository.save(student);
-    }
+    public Student createStudent(UUID teacherId, String name, String email) {
+    Teacher teacher = teacherService.findById(teacherId)
+            .orElseThrow(() -> new RuntimeException("Teacher not found"));
+    Student student = new Student();
+    student.setTeacher(teacher);
+    student.setName(name);
+    student.setEmail(email);
+    return studentRepository.save(student);
+}
 
     public List<Student> findByTeacherId(UUID teacherId) {
         return studentRepository.findByTeacherId(teacherId);
@@ -37,14 +42,20 @@ public class StudentService {
         return studentRepository.findById(id);
     }
 
-    public Student updateStudent(UUID id, String name) {
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-        student.setName(name);
-        return studentRepository.save(student);
-    }
+    public Student updateStudent(UUID id, String name, String email) {
+    Student student = studentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Student not found"));
+    student.setName(name);
+    student.setEmail(email);
+    return studentRepository.save(student);
+}
 
     public void deleteStudent(UUID id) {
         studentRepository.deleteById(id);
     }
+
+    public Optional<LocalDateTime> findLastSessionDate(UUID studentId) {
+    return sessionRepository.findLastSessionByStudentId(studentId)
+            .map(Session::getCreatedAt);
+}
 }

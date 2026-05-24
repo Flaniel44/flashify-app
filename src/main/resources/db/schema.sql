@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS teachers (
     name VARCHAR(100) NOT NULL,
     username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS students (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     teacher_id UUID NOT NULL REFERENCES teachers(id),
     name VARCHAR(100) NOT NULL,
+    email VARCHAR(255),
     created_at TIMESTAMP DEFAULT NOW()
 );
 

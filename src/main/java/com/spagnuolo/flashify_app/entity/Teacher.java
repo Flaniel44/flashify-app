@@ -29,4 +29,6 @@ public class Teacher {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private String email;
 }
