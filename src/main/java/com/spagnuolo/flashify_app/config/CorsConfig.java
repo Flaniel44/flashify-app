@@ -10,7 +10,12 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:3000", "http://192.168.0.165:3000")
+                .allowedOrigins(
+                    "http://localhost:3000",
+                    "http://192.168.0.165:3000",
+                    "http://192.168.0.199:3000",
+                    "https://flashify.whatisthis.place"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*");
     }
