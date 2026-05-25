@@ -3,6 +3,8 @@ package com.spagnuolo.flashify_app.service;
 import com.spagnuolo.flashify_app.entity.Teacher;
 import com.spagnuolo.flashify_app.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +19,11 @@ public class TeacherService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     // Registration code — keep this secret!
-    private static final String REGISTRATION_CODE = "flashify2026";
+    @Value("${flashify.registration-code}")
+    private String registrationCodeConfig;
 
     public Teacher register(String name, String username, String password, String registrationCode, String email) {
-    if (!registrationCode.equals(REGISTRATION_CODE)) {
+    if (!registrationCodeConfig.equals(registrationCode)) {
         throw new RuntimeException("Invalid registration code");
     }
     if (teacherRepository.findByUsername(username).isPresent()) {

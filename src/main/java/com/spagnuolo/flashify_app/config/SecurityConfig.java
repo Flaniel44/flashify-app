@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final RateLimitFilter rateLimitFilter;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -25,15 +26,16 @@ public class SecurityConfig {
             .cors(cors -> cors.configure(http))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-    .requestMatchers(
-        "/api/teachers/login",
-        "/api/teachers/register",
-        "/api/sessions/join/**",
-        "/api/sessions/*/words",
-        "/ws/**"
-    ).permitAll()
-    .anyRequest().authenticated()
-)
+                .requestMatchers(
+                    "/api/teachers/login",
+                    "/api/teachers/register",
+                    "/api/sessions/join/**",
+                    "/api/sessions/*/words",
+                    "/ws/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
