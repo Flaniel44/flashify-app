@@ -27,8 +27,9 @@ flashify-app/scripts/install-macos-auto-deploy.sh
 If either checkout already exists, use `git pull --ff-only origin main` instead
 of cloning it.
 
-Docker Desktop must be running. Java 21, Node.js, npm, and `rsync` must be
-available to the logged-in `daniel` user.
+Docker Desktop must be running. Git, `curl`, and `rsync` must be available to
+the logged-in `daniel` user. Java 21, Node.js, and npm run in temporary Docker
+build containers and do not need to be installed on the MacBook.
 
 ## Verify
 
@@ -46,7 +47,8 @@ tested `production` branches. When either changes, it:
 
 - refuses to overwrite tracked local source changes;
 - requires fast-forward-only source updates;
-- packages the backend and builds the frontend in their source checkouts;
+- packages the backend in a Maven/Java 21 container;
+- builds the frontend in a Node.js 22 container;
 - stages artifacts before replacing the live JAR and React build;
 - rebuilds only the Spring Boot image and refreshes nginx;
 - leaves PostgreSQL and `postgres_data` untouched;

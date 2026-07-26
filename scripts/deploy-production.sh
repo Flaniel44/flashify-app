@@ -92,10 +92,12 @@ STAGING_DIR="$(mktemp -d "${TMPDIR:-/tmp}/flashify-release.XXXXXX")"
 mkdir -p "${STAGING_DIR}/react-build"
 
 log "Packaging backend ${backend_target}..."
-(
-  cd "${BACKEND_REPO_DIR}"
-  ./mvnw --batch-mode -DskipTests clean package
-)
+docker run --rm \
+  --volume flashify_maven_cache:/root/.m2 \
+  --volume "${BACKEND_REPO_DIR}:/workspace" \
+  --workdir /workspace \
+  maven:3.9-eclipse-temurin-21 \
+  mvn --batch-mode -DskipTests clean package
 backend_jar="$(find "${BACKEND_REPO_DIR}/target" -maxdepth 1 -type f -name '*.jar' ! -name '*.original' | head -n 1)"
 if [[ -z "${backend_jar}" ]]; then
   log "Backend build produced no deployable JAR."
@@ -104,11 +106,12 @@ fi
 cp "${backend_jar}" "${STAGING_DIR}/flashify-app-0.0.1-SNAPSHOT.jar"
 
 log "Building frontend ${frontend_target}..."
-(
-  cd "${FRONTEND_REPO_DIR}"
-  npm ci
-  npm run build
-)
+docker run --rm \
+  --volume flashify_npm_cache:/root/.npm \
+  --volume "${FRONTEND_REPO_DIR}:/workspace" \
+  --workdir /workspace \
+  node:22-bookworm-slim \
+  sh -c 'npm ci && npm run build'
 rsync -a --delete "${FRONTEND_REPO_DIR}/build/" "${STAGING_DIR}/react-build/"
 
 log "Installing staged artifacts..."
