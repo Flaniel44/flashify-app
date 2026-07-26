@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS session_words (
 
 -- Session word order (for shuffled sessions)
 CREATE TABLE IF NOT EXISTS session_word_order (
+    id BIGSERIAL PRIMARY KEY,
     session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
     word_id UUID NOT NULL REFERENCES words(id) ON DELETE CASCADE,
-    position INT NOT NULL,
-    PRIMARY KEY (session_id, position)
+    position INT NOT NULL
 );

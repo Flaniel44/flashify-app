@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Test and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: flashify_test
+          POSTGRES_USER: flashify
+          POSTGRES_PASSWORD: flashify_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U flashify -d flashify_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/flashify_test
+      SPRING_DATASOURCE_USERNAME: flashify
+      SPRING_DATASOURCE_PASSWORD: flashify_ci
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      JWT_SECRET: flashify-ci-only-secret-key-long-enough-for-hs256
+      JWT_EXPIRATION: 86400000
+      FLASHIFY_REGISTRATION_CODE: flashify-ci
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Create test database schema
+        env:
+          PGPASSWORD: flashify_ci
+        run: psql -h 127.0.0.1 -U flashify -d flashify_test -f src/main/resources/db/schema.sql
+
+      - name: Test and package backend
+        run: ./mvnw --batch-mode clean verify
+
+  promote-production:
+    name: Mark commit ready for production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Advance production branch to the tested commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${REPOSITORY}/git/refs" \
+            -f ref="refs/heads/production" \
+            -f sha="${COMMIT_SHA}" \
+          || gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${REPOSITORY}/git/refs/heads/production" \
+            -f sha="${COMMIT_SHA}" \
+            -F force=false
