@@ -15,6 +15,7 @@ public class CorsConfig implements WebMvcConfigurer {
                     "http://localhost:3001",
                     "http://192.168.0.165:3000",
                     "http://192.168.0.199:3000",
+                    "https://flashify.digitalhandydan.ca",
                     "https://flashify.whatisthis.place"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
